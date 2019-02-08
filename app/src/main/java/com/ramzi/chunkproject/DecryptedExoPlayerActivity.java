@@ -45,10 +45,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.*;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.IllegalSeekPositionException;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.*;
 
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
@@ -157,6 +154,8 @@ public class DecryptedExoPlayerActivity extends AppCompatActivity implements Pla
         vIV = findViewById(R.id.volumeImageView);
         toolbarLayer = findViewById(R.id.toolbarLayer);
         loadingProgressbar = findViewById(R.id.progressBar_cyclic);
+
+        getDecoder();
 
         seekBar.setMax(100);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -533,6 +532,8 @@ public class DecryptedExoPlayerActivity extends AppCompatActivity implements Pla
         finish();
     }
 
+
+
     /**
      * *Gesture Listener of player
      * detection for brightness,volume and on screen seek
@@ -847,16 +848,22 @@ public class DecryptedExoPlayerActivity extends AppCompatActivity implements Pla
 
         if (mediaMergeSource != null) {
             player.addListener(this);
+
             player.prepare(mediaMergeSource);
+
             mExoPlayerView.setUseController(false);
+
             mExoPlayerView.setPlayer(player);
+
             player.setPlayWhenReady(true);
+
             play.animateToState(PlayIconDrawable.IconState.PAUSE);
 
             mExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
 
             if (isresume) {
                 try {
+
 
                     player.seekTo(pauseIndex, pausePosition);
 
@@ -865,7 +872,9 @@ public class DecryptedExoPlayerActivity extends AppCompatActivity implements Pla
                 }
                 isresume = false;
             }
+
         }
+
     }
 
 
@@ -913,4 +922,78 @@ public class DecryptedExoPlayerActivity extends AppCompatActivity implements Pla
             animateView(toolbarLayer, false, DEFAULT_CONTROLS_DURATION, 0);
         }
     }
+
+    public void getDecoder()
+    {
+        boolean preferExtensionDecoders =true;
+        @DefaultRenderersFactory.ExtensionRendererMode int extensionRendererMode =
+                useExtensionRenderers()
+                        ? (preferExtensionDecoders ? DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
+                        : DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
+                        : DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF;
+
+        Log.d("LALALALALA",extensionRendererMode+"extention mode");
+    }
+
+    public boolean useExtensionRenderers() {
+        return "withExtensions".equals(BuildConfig.FLAVOR);
+    }
+    public void hwclick(View view) {
+        isresume=true;
+         pauseIndex = player.getCurrentPeriodIndex();
+        pausePosition = player.getCurrentPosition();
+        DefaultRenderersFactory renderersFactory =
+                new DefaultRenderersFactory(this, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);
+        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
+
+        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+        player.setPlayWhenReady(false);
+        player.release();
+        player = ExoPlayerFactory.newSimpleInstance(this,renderersFactory,trackSelector);
+        loadPlayer();
+//        player.seekTo(pauseIndex,pausePosition);
+//        player.setPlayWhenReady(true);
+
+//        audioReactor = new AudioReactor(getApplicationContext(), player);
+//        maxVolume = audioReactor.getMaxVolume();
+//        DefaultRenderersFactory renderersFactory =
+//                new DefaultRenderersFactory(this, extensionRendererMode);
+
+    }
+
+    public void swclick(View view) {
+        isresume=true;
+         pauseIndex = player.getCurrentPeriodIndex();
+         pausePosition = player.getCurrentPosition();
+
+        DefaultRenderersFactory renderersFactory =
+                new DefaultRenderersFactory(this, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
+        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
+        player.setPlayWhenReady(false);
+        player.release();
+        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+        player = ExoPlayerFactory.newSimpleInstance(this,renderersFactory,trackSelector);
+//        player.par
+        loadPlayer();
+//        player.seekTo(pauseIndex,pausePosition);
+//        player.setPlayWhenReady(true);
+
+
+    }
+
+/*
+    DefaultRenderersFactory rf = new DefaultRenderersFactory(this.getApplicationContext(), null, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON); player = ExoPlayerFactory.newSimpleInstance( rf, new DefaultTrackSelector(), new DefaultLoadControl() );
+
+
+DefaultRenderersFactory renderersFactory =
+          new DefaultRenderersFactory(this, extensionRendererMode);
+
+      trackSelector = new DefaultTrackSelector(trackSelectionFactory);
+      trackSelector.setParameters(trackSelectorParameters);
+      lastSeenTrackGroupArray = null;
+
+      player =
+          ExoPlayerFactory.newSimpleInstance(
+ this, renderersFactory, trackSelector, drmSessionManager);
+*/
 }

@@ -161,5 +161,17 @@
             android:visibility="invisible"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
+    <LinearLayout android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+    android:orientation="horizontal">
+        <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="hwclick"
+        android:text="H/W"/>
+        <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="swclick"
+                android:text="S/W"/>
+    </LinearLayout>
 </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
